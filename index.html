@@ -1,224 +1,219 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OCSMF – Sustainable Markets Foundation</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-    body {
-      background-color: #f9f9f9;
-      color: #333;
-    }
-    header {
-      background-color: #333;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-    nav {
-      background-color: #e0e0e0;
-      padding: 0.5rem;
-      text-align: center;
-    }
-    nav a {
-      color: #333;
-      margin: 0 1rem;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    nav a:hover {
-      color: #66bb6a;
-    }
-    .hero {
-      background: url('https://images.unsplash.com/photo-1600585154347-6be76e9f6f3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center/cover;
-      padding: 4rem 1rem;
-      text-align: center;
-      color: white;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-    }
-    .hero h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-    .hero h1 .white {
-      color: white;
-    }
-    .hero h1 .green {
-      color: #66bb6a;
-    }
-    .hero h1 .red {
-      color: #e57373;
-    }
-    .hero p {
-      font-size: 1.2rem;
-      margin-bottom: 2rem;
-    }
-    .hero .btn {
-      background-color: #66bb6a;
-      color: white;
-      padding: 0.8rem 1.5rem;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
-    }
-    .hero .btn:hover {
-      background-color: #558b2f;
-    }
-    .section {
-      padding: 2rem 1rem;
-      text-align: center;
-    }
-    .section h2 {
-      color: #333;
-      margin-bottom: 1rem;
-    }
-    .section p {
-      max-width: 800px;
-      margin: 0 auto 1rem;
-    }
-    .cards {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-top: 1rem;
-    }
-    .card {
-      background-color: white;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      padding: 1rem;
-      width: 200px;
-      text-align: center;
-    }
-    .card img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 5px;
-      margin-bottom: 0.5rem;
-    }
-    .card h3 {
-      color: #66bb6a;
-      margin-bottom: 0.5rem;
-    }
-    .merch-image {
-      width: 100%;
-      max-width: 300px;
-      height: auto;
-      border-radius: 5px;
-      margin: 1rem auto;
-      display: block;
-    }
-    footer {
-      background-color: #333;
-      color: white;
-      text-align: center;
-      padding: 1rem;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCSMF – Sustainable Markets Foundation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        nav {
+            background-color: #e0e0e0;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        nav a {
+            color: #333;
+            margin: 0 1rem;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #66bb6a;
+        }
+        .hero {
+            background: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center/cover;
+            padding: 4rem 1rem;
+            text-align: center;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .hero h1 .white {
+            color: white;
+        }
+        .hero h1 .green {
+            color: #66bb6a;
+        }
+        .hero h1 .red {
+            color: #e57373;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        .hero .btn {
+            background-color: #66bb6a;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .hero .btn:hover {
+            background-color: #558b2f;
+        }
+        .section {
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .section p {
+            max-width: 800px;
+            margin: 0 auto 1rem;
+        }
+        .cards {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 1rem;
+            width: 200px;
+            text-align: center;
+        }
+        .card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+        .card h3 {
+            color: #66bb6a;
+            margin-bottom: 0.5rem;
+        }
+        .merch-image {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 5px;
+            margin: 1rem auto;
+            display: block;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+    <script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    var filteredData = jsonData.filter(row => row.some(filledCell));
+                    var headerRowIndex = filteredData.findIndex((row, index) =>
+                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                        headerRowIndex = 0;
+                    }
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                    return csv;
+                } catch (e) {
+                    console.error(e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
+    </script>
 </head>
 <body>
-  <header>
-    <h1>OCSMF</h1>
-    <p>Online Community for Sustainable Markets Foundation</p>
-  </header>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="catalog.html">Catalog</a>
-    <a href="blog.html">Blog</a>
-    <a href="merch-page/index.html">Merch</a>
-    <a href="about.html">About</a>
-  </nav>
-  <section class="hero">
-    <h1>
-      <span class="white">Connecting</span> 
-      <span class="green">Sustainable Producers</span> 
-      <span class="red">with Consumers</span>
-    </h1>
-    <p>Join us in building a greener future by supporting local, eco-friendly producers.</p>
-    <a href="catalog.html" class="btn">Explore Products</a>
-  </section>
-  <section class="section">
-    <h2>Our Mission</h2>
-    <p>OCSMF is dedicated to promoting sustainable living by connecting consumers with local producers of eco-friendly products. From organic vegetables to handmade crafts, we support a greener world.</p>
-  </section>
-  <section class="section">
-    <h2>Featured Categories</h2>
-    <div class="cards">
-      <div class="card">
-        <img src="https://images.unsplash.com/photo-1600585154347-6be76e9f6f3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Organic Produce">
-        <h3>Organic Produce</h3>
-        <p>Fresh, locally grown vegetables and fruits.</p>
-      </div>
-      <div class="card">
-        <img src="https://images.unsplash.com/photo-1607349913338-82b06a1c75d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Eco Crafts">
-        <h3>Eco Crafts</h3>
-        <p>Handmade items with sustainable materials.</p>
-      </div>
-      <div class="card">
-        <img src="https://images.unsplash.com/photo-1600585154347-6be76e9f6f3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Green Living">
-        <h3>Green Living</h3>
-        <p>Eco-friendly products for your home.</p>
-      </div>
-    </div>
-  </section>
-  <section class="section">
-    <h2>Support Our Cause</h2>
-    <p>Check out our "One Cucumber, So Many Faces" merch line and support sustainable markets with every purchase.</p>
-    <img src="https://images.unsplash.com/photo-1600585154347-6be76e9f6f3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="OCSMF Merch" class="merch-image">
-    <a href="merch-page/index.html" class="btn">Shop Merch</a>
-  </section>
-  <footer>
-    <p>© 2025 OCSMF. All rights reserved.</p>
-  </footer>
+    <header>
+        <h1>OCSMF</h1>
+        <p>Online Community for Sustainable Markets Foundation</p>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="catalog.html">Catalog</a>
+        <a href="blog.html">Blog</a>
+        <a href="merch-page/index.html">Merch</a>
+        <a href="about.html">About</a>
+    </nav>
+    <section class="hero">
+        <h1>
+            <span class="white">Connecting</span> 
+            <span class="green">Sustainable Producers</span> 
+            <span class="red">with Consumers</span>
+        </h1>
+        <p>Join us in building a greener future by supporting local, eco-friendly producers.</p>
+        <a href="catalog.html" class="btn">Explore Products</a>
+    </section>
+    <section class="section">
+        <h2>Our Mission</h2>
+        <p>OCSMF is dedicated to promoting sustainable living by connecting consumers with local producers of eco-friendly products. From organic vegetables to handmade crafts, we support a greener world.</p>
+    </section>
+    <section class="section">
+        <h2>Featured Categories</h2>
+        <div class="cards">
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1499529112087-3cb3b73cec95?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Organic Produce">
+                <h3>Organic Produce</h3>
+                <p>Fresh, locally grown vegetables and fruits.</p>
+            </div>
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1600585154347-6be76e9f6f3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Eco Crafts">
+                <h3>Eco Crafts</h3>
+                <p>Handmade items with sustainable materials.</p>
+            </div>
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Green Living">
+                <h3>Green Living</h3>
+                <p>Eco-friendly products for your home.</p>
+            </div>
+        </div>
+    </section>
+    <section class="section">
+        <h2>Support Our Cause</h2>
+        <p>Check out our "One Cucumber, So Many Faces" merch line and support sustainable markets with every purchase.</p>
+        <img src="https://images.unsplash.com/photo-1600585154347-6be76e9f6f3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="OCSMF Merch" class="merch-image">
+        <a href="merch-page/index.html" class="btn">Shop Merch</a>
+    </section>
+    <footer>
+        <p>© 2025 OCSMF. All rights reserved.</p>
+    </footer>
 </body>
 </html>
